@@ -11,6 +11,10 @@ function App() {
 const [data, setData] = useState(db)
 const [cart, setCart] = useState([])
 
+const MIN_ITEMS = 1
+// Maximo de elementos en el carrito, lo dejamos en una variable para utilizarlo y modificarlo mas facilmente
+const MAX_ITEMS = 5
+
  // Creamos una función más descriptiva para agregar elementos al carrito de compras
  function addToCart(item) {
 
@@ -21,13 +25,53 @@ const [cart, setCart] = useState([])
     setCart(updatedCart)
   }else {
     item.quantity = 1
+    setCart([...cart, item])
   }
-  setCart(prevCart => [...prevCart, item])
+  
+}
+
+function removeFromCart(id) {
+  // una vez eliminada la guitarra --> guitar.id !== id --> que sea diferente ya que queremos traernos las guitarras que aun estan en el carrito
+  setCart(prevCart => prevCart.filter(guitar => guitar.id !== id)) 
+}
+
+function decreaseQuantity (id) {
+//utilizamos map para modificar el arreglo, sin cambiar el array original, si no el de la variable
+  const updatedCart = cart.map( item => { 
+    if(item.id === id && item.quantity < MAX_ITEMS) {
+      return {
+        ...item,
+        quantity: item.quantity + 1
+      }
+    }
+    // colocamos otro retum para que mantenga los otros elementos donde no aumente la cantidad
+    return item
+  })
+  // Seteamos para que se mantenga todo en el carrito
+  setCart(updatedCart)
+}
+
+function increaseQuantity (id) {
+  const updatedCart = cart.map ( item => {
+    if(item.id === id && item.quantity > MIN_ITEMS) {
+      return {
+        ...item,
+        quantity: item.quantity - 1
+      }
+    }
+    return item
+  })
+  setCart(updatedCart)
 }
 
   return (
     <>
-    <Header/>
+    <Header
+      cart={cart}
+      removeFromCart={removeFromCart}
+      decreaseQuantity={decreaseQuantity}
+      increaseQuantity={increaseQuantity}
+    />
 
       <main className="container-xl mt-5">
         <h2 className="text-center">Nuestra Colección</h2>
